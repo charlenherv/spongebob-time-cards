@@ -1,5 +1,7 @@
 # sb-timecards
 
+![alt text](https://github.com/charlenherv/SpongeBob-Time-Cards/blob/master/readme.png?raw=true)
+
 ## Project setup
 ```
 npm install
