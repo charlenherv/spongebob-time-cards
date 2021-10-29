@@ -20,7 +20,7 @@
               :value="unit.val"
               class="UnitOption"
             >
-              {{ unit.label ? unit.label : unit.val }}
+              {{ unit.label ? unit.label : unit.val | capitalize}}
             </option>
           </select>
         </div>
@@ -34,7 +34,7 @@
               :value="bg"
               class="BackgroundOption"
             >
-              {{ bg }}
+              {{ bg | removeExtension}}
             </option>
           </select>
         </div>
@@ -85,6 +85,21 @@ export default {
       const appData = this;
       appData.$refs.TimeCard.saveCard();
     }
+  },
+  filters: {
+      capitalize: function (data) {
+        let capitalized = []
+        data.split(' ').forEach(word => {
+          capitalized.push(
+            word.charAt(0).toUpperCase() +
+            word.slice(1).toLowerCase()
+          )
+        })
+        return capitalized.join(' ')
+      },
+      removeExtension: function(data) {
+        return data.replace(/\.[^/.]+$/, "")
+      }
   },
   mounted() {
     const appData = this;

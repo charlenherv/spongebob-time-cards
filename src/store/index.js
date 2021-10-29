@@ -11,7 +11,12 @@ export default new Vuex.Store({
       { val: 'seconds' },
       { val: 'minutes' },
       { val: 'hours' },
+      { val: 'days' },
+      { val: 'weeks' },
+      { val: 'fortnites' },
+      { val: 'months' },
       { val: 'years' },
+      { val: 'decades' },
       { val: 'centuries' },
       { val: 'eternities' },
       /*{ 
