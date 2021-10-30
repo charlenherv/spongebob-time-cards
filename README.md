@@ -24,3 +24,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+Currently accepts URL query paramenters for **number** and **unit** (unit must be included in current options). File will auto-save upon opening of the page.
