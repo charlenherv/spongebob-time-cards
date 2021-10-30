@@ -1,14 +1,29 @@
 <template>
   <div id="app" class="App">
-    <div class="AppContainer" v-if="loaded">
-      <img class="Logo" src="@/assets/logo.png" alt="BobSponge Time Cards">
+    <div class="AppContainer">
+      <img class="Logo" src="@/assets/logo.png" alt="BobSponge Time Cards" />
 
-      <TimeCard ref="TimeCard" :number="number" :unit="unit" :background="background" />
+      <div class="DivisionLine"></div>
+
+      <TimeCard
+        v-if="backgrounds"
+        ref="TimeCard"
+        :number="number"
+        :unit="unit"
+        :background="background"
+      />
       <button class="SaveButton" @click="saveCard">Save Card</button>
+
+      <div class="DivisionLine"></div>
+
       <div class="Controls">
         <div class="ControlSection">
           <span class="ControlLabel">Number</span>
-          <input type="text" v-model="inputNumber" />
+          <input
+            type="text"
+            v-model="inputNumber"
+            @keypress="isNumber($event)"
+          />
         </div>
 
         <div class="ControlSection">
@@ -20,7 +35,7 @@
               :value="unit.val"
               class="UnitOption"
             >
-              {{ unit.label ? unit.label : unit.val | capitalize}}
+              {{ unit.label ? unit.label : unit.val | capitalize }}
             </option>
           </select>
         </div>
@@ -34,7 +49,7 @@
               :value="bg"
               class="BackgroundOption"
             >
-              {{ bg | removeExtension}}
+              {{ bg | removeExtension }}
             </option>
           </select>
         </div>
@@ -44,10 +59,14 @@
 </template>
 
 <script>
+import Vue from "vue";
 import TimeCard from "./components/TimeCard.vue";
+import titleMixin from "./mixins/title";
+Vue.mixin(titleMixin);
 
 export default {
   name: "App",
+  title: "SpongeBob Time Card Generators",
   components: {
     TimeCard,
   },
@@ -74,7 +93,6 @@ export default {
   },
   data() {
     return {
-      loaded: false,
       inputNumber: 2,
       unit: "hours",
       background: this.randomBG,
@@ -84,47 +102,117 @@ export default {
     saveCard() {
       const appData = this;
       appData.$refs.TimeCard.saveCard();
-    }
+    },
+    isNumber: function (evt) {
+      evt = evt ? evt : window.event;
+      var charCode = evt.which ? evt.which : evt.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57) &&
+        charCode !== 46
+      ) {
+        evt.preventDefault();
+      } else {
+        return true;
+      }
+    },
   },
   filters: {
-      capitalize: function (data) {
-        let capitalized = []
-        data.split(' ').forEach(word => {
-          capitalized.push(
-            word.charAt(0).toUpperCase() +
-            word.slice(1).toLowerCase()
-          )
-        })
-        return capitalized.join(' ')
-      },
-      removeExtension: function(data) {
-        return data.replace(/\.[^/.]+$/, "")
-      }
+    capitalize: function (data) {
+      let capitalized = [];
+      data.split(" ").forEach((word) => {
+        capitalized.push(
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        );
+      });
+      return capitalized.join(" ");
+    },
+    removeExtension: function (data) {
+      return data.replace(/\.[^/.]+$/, "");
+    },
+  },
+  watch: {
+    randomBG(newValue) {
+      this.background = newValue;
+    },
   },
   mounted() {
     const appData = this;
     appData.$store.dispatch("getBackgrounds");
-    setTimeout(function(){
-      appData.loaded = true;
-      appData.background = appData.randomBG
-    }, 500);
-  }
+
+    // Get URL data
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const number = urlParams.get("number");
+    const unit = urlParams.get("unit");
+
+    // Update number
+    if (number) {
+      appData.inputNumber = number;
+    }
+
+    // Update unit
+    if (unit && appData.units.some((unitObj) => unitObj.val === unit)) {
+      appData.unit = unit;
+    }
+
+    // Auto print
+    if (number || unit) {
+      setTimeout(function () {
+        appData.saveCard();
+      }, 100);
+    }
+  },
 };
 </script>
 
 <style lang="scss">
+.App {
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-family: sans-serif;
+  text-align: center;
+  background-image: url("~@/assets/main_bg.jpg");
+  background-size: 800px 425px;
+  color: white;
+}
+.AppContainer {
+  box-sizing: border-box;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 10px;
+
+  background: rgba(255, 255, 255, 0.35);
+
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.DivisionLine {
+  height: 1px;
+  margin: 10px 10px;
+  background: white;
+  opacity: 0.15;
+}
+
 .Logo {
   width: 300px;
-  margin-bottom: 10px;
+  max-width: 100%;
 }
 .Header {
   font-size: 24px;
   text-transform: uppercase;
   color: rgb(23, 30, 54);
 }
+
 .Controls {
   padding: 20px;
   border-radius: 20px;
+  text-align: left;
   input,
   select {
     cursor: pointer;
@@ -134,10 +222,14 @@ export default {
     font-size: 14px;
   }
   .ControlSection {
+    display: inline-block;
     margin-bottom: 20px;
+    margin-right: 20px;
     text-align: left;
     .ControlLabel {
+      display: block;
       margin-right: 10px;
+      margin-bottom: 2.5px;
       font-weight: bolder;
     }
   }
@@ -156,59 +248,9 @@ export default {
   font-weight: bolder;
   color: white;
 }
-.App {
-  overflow: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  font-family: sans-serif;
-  text-align: center;
-  background-image: url("~@/assets/main_bg.jpg");
-  background-size: cover;
-  color:white;
-}
-.AppContainer {
-  box-sizing: border-box;
-  width: 800px;
-  max-width: 100%;
-  margin: 0 auto;
 
-  background: rgba(255, 255, 255, 0.35);
-
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-
-  // -webkit-animation: fade-in 0.25s ease-in both;
-	// animation: fade-in 0.25s ease-in both;
-}
-@-webkit-keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.UnitOption {
-  &:first-letter {
-    text-transform: capitalize;
-  }
-}
-
-
-
-input, select {
+input,
+select {
   border-radius: 4px;
   padding: 10px;
 }
