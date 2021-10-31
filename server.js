@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const fs = require("fs");
 const path = require('path');
+const client = __dirname + '/public';
 
 app.get('/getBackgrounds', (req, res) => {
     const directoryPath = path.join(__dirname, '/public/backgrounds/');
@@ -21,6 +22,13 @@ app.get('/getBackgrounds', (req, res) => {
         res.json(filteredFiles);
     });
 })
+
+// STATIC
+app.use(express.static(client+'/'));
+app.get('/', (req,res) => {
+  res.sendFile(client + "/index.html");
+});
+
 
 app.listen(process.env.PORT || 5000, '0.0.0.0', function(){
     console.log('Running on localhost:5000')
