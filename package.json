@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
+    "express": "^4.17.1",
     "fast-average-color": "^6.4.2",
     "html2canvas": "^1.3.2",
     "nodemon": "^2.0.14",
