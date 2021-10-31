@@ -11,6 +11,7 @@
         ref="Text"
         class="TimeCard_Text"
         v-if="backgroundRendered"
+        data-html2canvas-ignore="true"
         :style="'transform: translate(-50%,-50%)'"
       >
         <span class="Number">{{ displayNumber }}</span
@@ -64,7 +65,11 @@ export default {
         link.click();
       }
       function printToFile() {
-        html2canvas(appData.$refs.Card, {scale: 3})
+        html2canvas(appData.$refs.Card, {
+          scrollX: 0,
+          scrollY: -window.scrollY,
+          scale: 3
+        })
           .then(function (canvas) {
             canvas.toBlob(
               function (blob) {

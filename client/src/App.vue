@@ -167,13 +167,12 @@ export default {
 </script>
 
 <style lang="scss">
+body,html {
+  margin: 0;
+  padding: 0;
+}
 .App {
   overflow: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   font-family: sans-serif;
   text-align: center;
   background-image: url("~@/assets/main_bg.jpg");
