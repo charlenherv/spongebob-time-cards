@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require('path');
 const client = __dirname + '/public';
 
+app.use(express.static(path.join(client)));
+
 app.get('/getBackgrounds', (req, res) => {
     const directoryPath = path.join(__dirname, '/public/backgrounds/');
     fs.readdir(directoryPath, function (err, files) {
@@ -29,7 +31,8 @@ app.get('/', (req,res) => {
   res.sendFile(client + "/index.html");
 });
 
-
-app.listen(process.env.PORT, function(){
-    console.log('Running on localhost:5000')
+const port = process.env.PORT || 5000;
+app.listen(port, function(){
+    console.log('Running on '+ port);
+    console.log('Static set to '+ client + "/index.html")
 });
