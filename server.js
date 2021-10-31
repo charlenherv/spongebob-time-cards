@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const fs = require("fs");
 const path = require('path');
+const port = process.env.PORT || 5000;
+const host = '0.0.0.0';
 
 app.get('/getBackgrounds', (req, res) => {
     const directoryPath = path.join(__dirname, '/public/backgrounds/');
@@ -22,4 +24,6 @@ app.get('/getBackgrounds', (req, res) => {
     });
 })
 
-app.listen(process.env.PORT || 5000, () => console.log('Running on localhost:5000'));
+app.listen(port, host, function(){
+    console.log('Running on localhost:5000')
+});
