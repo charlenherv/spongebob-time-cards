@@ -11,7 +11,6 @@
         ref="Text"
         class="TimeCard_Text"
         v-if="backgroundRendered"
-        data-html2canvas-ignore="true"
         :style="'transform: translate(-50%,-50%)'"
       >
         <span class="Number">{{ displayNumber }}</span
