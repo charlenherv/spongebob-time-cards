@@ -30,6 +30,6 @@ app.get('/', (req,res) => {
 });
 
 
-app.listen(process.env.PORT || 5000, '0.0.0.0', function(){
+app.listen(process.env.PORT, function(){
     console.log('Running on localhost:5000')
 });
