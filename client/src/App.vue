@@ -1,0 +1,257 @@
+<template>
+  <div id="app" class="App">
+    <div class="AppContainer">
+      <img class="Logo" src="@/assets/logo.png" alt="BobSponge Time Cards" />
+
+      <div class="DivisionLine"></div>
+
+      <TimeCard
+        v-if="backgrounds"
+        ref="TimeCard"
+        :number="number"
+        :unit="unit"
+        :background="background"
+      />
+      <button class="SaveButton" @click="saveCard">Save Card</button>
+
+      <div class="DivisionLine"></div>
+
+      <div class="Controls">
+        <div class="ControlSection">
+          <span class="ControlLabel">Number</span>
+          <input
+            type="text"
+            v-model="inputNumber"
+            @keypress="isNumber($event)"
+          />
+        </div>
+
+        <div class="ControlSection">
+          <span class="ControlLabel">Unit</span>
+          <select class="custom-select" id="unit" v-model="unit">
+            <option
+              v-for="(unit, index) in units"
+              :key="index"
+              :value="unit.val"
+              class="UnitOption"
+            >
+              {{ unit.label ? unit.label : unit.val | capitalize }}
+            </option>
+          </select>
+        </div>
+
+        <div class="ControlSection">
+          <span class="ControlLabel">Background</span>
+          <select class="custom-select" id="background" v-model="background">
+            <option
+              v-for="(bg, index) in backgrounds"
+              :key="index"
+              :value="bg"
+              class="BackgroundOption"
+            >
+              {{ bg | removeExtension }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Vue from "vue";
+import TimeCard from "./components/TimeCard.vue";
+import titleMixin from "./mixins/title";
+Vue.mixin(titleMixin);
+
+export default {
+  name: "App",
+  title: "SpongeBob Time Card Generators",
+  components: {
+    TimeCard,
+  },
+  computed: {
+    // Lists
+    units() {
+      return this.$store.state.units;
+    },
+    backgrounds() {
+      return this.$store.state.backgrounds;
+    },
+
+    // Defaults
+    randomBG() {
+      return this.backgrounds[
+        Math.floor(Math.random() * this.backgrounds.length)
+      ];
+    },
+
+    // User Entries
+    number() {
+      return this.inputNumber ? parseFloat(this.inputNumber) : 2;
+    },
+  },
+  data() {
+    return {
+      inputNumber: 2,
+      unit: "hours",
+      background: this.randomBG,
+    };
+  },
+  methods: {
+    saveCard() {
+      const appData = this;
+      appData.$refs.TimeCard.saveCard();
+    },
+    isNumber: function (evt) {
+      evt = evt ? evt : window.event;
+      var charCode = evt.which ? evt.which : evt.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57) &&
+        charCode !== 46
+      ) {
+        evt.preventDefault();
+      } else {
+        return true;
+      }
+    },
+  },
+  filters: {
+    capitalize: function (data) {
+      let capitalized = [];
+      data.split(" ").forEach((word) => {
+        capitalized.push(
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        );
+      });
+      return capitalized.join(" ");
+    },
+    removeExtension: function (data) {
+      return data.replace(/\.[^/.]+$/, "");
+    },
+  },
+  watch: {
+    randomBG(newValue) {
+      this.background = newValue;
+    },
+  },
+  mounted() {
+    const appData = this;
+    appData.$store.dispatch("getBackgrounds");
+
+    // Get URL data
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const number = urlParams.get("number");
+    const unit = urlParams.get("unit");
+
+    // Update number
+    if (number) {
+      appData.inputNumber = number;
+    }
+
+    // Update unit
+    if (unit && appData.units.some((unitObj) => unitObj.val === unit)) {
+      appData.unit = unit;
+    }
+
+    // Auto print
+    if (number || unit) {
+      setTimeout(function () {
+        appData.saveCard();
+      }, 100);
+    }
+  },
+};
+</script>
+
+<style lang="scss">
+.App {
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-family: sans-serif;
+  text-align: center;
+  background-image: url("~@/assets/main_bg.jpg");
+  background-size: 800px 425px;
+  color: white;
+}
+.AppContainer {
+  box-sizing: border-box;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 10px;
+
+  background: rgba(255, 255, 255, 0.35);
+
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.DivisionLine {
+  height: 1px;
+  margin: 10px 10px;
+  background: white;
+  opacity: 0.15;
+}
+
+.Logo {
+  width: 300px;
+  max-width: 100%;
+}
+.Header {
+  font-size: 24px;
+  text-transform: uppercase;
+  color: rgb(23, 30, 54);
+}
+
+.Controls {
+  padding: 20px;
+  border-radius: 20px;
+  text-align: left;
+  input,
+  select {
+    cursor: pointer;
+    outline: none;
+    box-shadow: none;
+    border: none;
+    font-size: 14px;
+  }
+  .ControlSection {
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    text-align: left;
+    .ControlLabel {
+      display: block;
+      margin-right: 10px;
+      margin-bottom: 2.5px;
+      font-weight: bolder;
+    }
+  }
+}
+.SaveButton {
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 10px;
+  margin: 10px 0;
+  background: rgb(13, 108, 204);
+  box-shadow: -4px 4px rgb(6, 57, 107);
+  border: none;
+  outline: none;
+  text-transform: uppercase;
+  font-weight: bolder;
+  color: white;
+}
+
+input,
+select {
+  border-radius: 4px;
+  padding: 10px;
+}
+</style>
