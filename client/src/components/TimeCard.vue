@@ -1,11 +1,10 @@
 <template>
   <div class="TimeCard_Container" :data-responsive="responsiveLevel">
-    <!-- Card for Display-->
     <div
       ref="Card"
       class="TimeCard"
       :style="styleObjectDisplay"
-      v-resize="responsive"
+      v-resize="setResponsiveLevel"
     >
       <div
         ref="Text"
@@ -44,12 +43,11 @@ export default {
       backgroundColor: "transparent",
       textColor: "FFFFFF",
       textShadowColor: "EF4BC3",
-
       responsiveLevel: 1,
     };
   },
   methods: {
-    saveCard() {
+    saveCard(filename) {
       const appData = this;
 
       Vue.nextTick(function () {
@@ -72,7 +70,7 @@ export default {
           .then(function (canvas) {
             canvas.toBlob(
               function (blob) {
-                saveAs(blob, "sbtimecard.png");
+                saveAs(blob, filename);
               },
               "image/png",
               1
@@ -209,7 +207,7 @@ export default {
         return finalHex;
       }
     },
-    responsive() {
+    setResponsiveLevel() {
       const appData = this;
       const card = appData.$refs.Card;
       const dimensions = card.getBoundingClientRect();
@@ -315,11 +313,7 @@ export default {
   },
   directives: {
     resize,
-  },
-  mounted() {
-    const appData = this;
-    appData.processBackground();    
-  },
+  }
 };
 </script>
 

@@ -12,6 +12,7 @@
         :unit="unit"
         :background="background"
       />
+      
       <button class="SaveButton" @click="saveCard">Save Card</button>
 
       <div class="DivisionLine"></div>
@@ -22,7 +23,7 @@
           <input
             type="text"
             v-model="inputNumber"
-            @keypress="isNumber($event)"
+            @keypress="validateNumber($event)"
           />
         </div>
 
@@ -49,61 +50,57 @@
               :value="bg"
               class="BackgroundOption"
             >
-              {{ bg | removeExtension }}
+              {{ bg | removeExtensionFilter }}
             </option>
           </select>
         </div>
       </div>
-    </div>
+    </div>    
   </div>
 </template>
 
 <script>
-import Vue from "vue";
+
 import TimeCard from "./components/TimeCard.vue";
-import titleMixin from "./mixins/title";
-Vue.mixin(titleMixin);
 
 export default {
   name: "App",
-  title: "SpongeBob Time Card Generators",
+  title: "SpongeBob Time Card Generator",
   components: {
     TimeCard,
   },
-  computed: {
-    // Lists
+  computed: {    
     units() {
       return this.$store.state.units;
     },
     backgrounds() {
       return this.$store.state.backgrounds;
     },
-
-    // Defaults
     randomBG() {
       return this.backgrounds[
         Math.floor(Math.random() * this.backgrounds.length)
       ];
     },
-
-    // User Entries
     number() {
       return this.inputNumber ? parseFloat(this.inputNumber) : 2;
+    },
+    cardSavedName() {
+      return `SpongeBob Time Card - ${this.number} ${this.unit} Later`
     },
   },
   data() {
     return {
       inputNumber: 2,
       unit: "hours",
-      background: this.randomBG,
+      background: null
     };
   },
   methods: {
     saveCard() {
       const appData = this;
-      appData.$refs.TimeCard.saveCard();
+      appData.$refs.TimeCard.saveCard(appData.cardSavedName);
     },
-    isNumber: function (evt) {
+    validateNumber: function (evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
       if (
@@ -116,6 +113,17 @@ export default {
         return true;
       }
     },
+    getTitle (vm) {
+    const { title } = vm.$options
+    if (title) {
+      return typeof title === 'function'
+        ? title.call(vm)
+        : title
+    }
+  },
+  removeExtension(data) {
+    return data.replace(/\.[^/.]+$/, "");
+  }
   },
   filters: {
     capitalize: function (data) {
@@ -127,7 +135,7 @@ export default {
       });
       return capitalized.join(" ");
     },
-    removeExtension: function (data) {
+    removeExtensionFilter: function (data) {
       return data.replace(/\.[^/.]+$/, "");
     },
   },
@@ -138,7 +146,11 @@ export default {
   },
   mounted() {
     const appData = this;
+
+    // Load content - - - - - - -
     appData.$store.dispatch("getBackgrounds");
+
+    // Accept URL params - - - - - - -
 
     // Get URL data
     const queryString = window.location.search;
@@ -163,6 +175,12 @@ export default {
       }, 100);
     }
   },
+  created () {
+      const title = this.getTitle(this)
+      if (title) {
+        document.title = title
+      }
+    }
 };
 </script>
 
@@ -224,6 +242,7 @@ body,html {
   }
   .ControlSection {
     display: inline-block;
+    vertical-align: top;
     margin-bottom: 20px;
     margin-right: 20px;
     text-align: left;
