@@ -172,7 +172,9 @@ body,html {
   padding: 0;
 }
 .App {
-  overflow: auto;
+  overflow: auto;    
+  height: 100vh;
+    width: 100vw;
   font-family: sans-serif;
   text-align: center;
   background-image: url("~@/assets/main_bg.jpg");

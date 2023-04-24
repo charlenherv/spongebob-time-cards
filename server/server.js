@@ -31,7 +31,7 @@ app.get('/', (req,res) => {
   res.sendFile(client + "/index.html");
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 app.listen(port, function(){
     console.log('Running on '+ port);
     console.log('Static set to '+ client + "/index.html")
